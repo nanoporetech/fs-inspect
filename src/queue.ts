@@ -1,8 +1,9 @@
+import { asDefined } from "ts-runtime-typecheck";
 import { deferred } from "./deferred";
 
 export function queue<T> (concurrency: number, fn: (v: T) => Promise<void> | void) {
   const { promise, resolve, reject } = deferred<void>();
-  const pending = [];
+  const pending: T[] = [];
   let running = 0;
   let failed = false;
 
@@ -13,7 +14,7 @@ export function queue<T> (concurrency: number, fn: (v: T) => Promise<void> | voi
     // running threads goes up and down depending on the amount in the queue
     // and thread congestion
     while (pending.length > 0) {
-      const next = pending.shift();
+      const next = asDefined(pending.shift()); // we check above, so this will always return a value
       try {
         await fn(next);
       } catch (e) {

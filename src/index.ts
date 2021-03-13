@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import fs from 'fs';
 import path from 'path';
 import type { Crawler, CrawlerOptions } from './Crawler.type';
 import { makeFileInfo } from './FileInfo';
@@ -30,7 +30,7 @@ export function crawler <T = FileInfo>(options: CrawlerOptions<T> = {}): Crawler
             return; // if the exclusion folder indicates we should ignore this folder then exit here
           }
           // add all the entries of the folder to the queue
-          for (const entry of await fs.readdir(info.absolute)) {
+          for (const entry of await fs.promises.readdir(info.absolute)) {
             add(path.join(relative, entry));
           }
           if (!includeFolders) {
