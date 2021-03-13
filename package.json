@@ -1,0 +1,21 @@
+{
+  "name": "file_scanner",
+  "version": "0.1.0",
+  "description": "directory tree scanner for Node.js",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shortercode/file_scanner.git"
+  },
+  "author": "shortercode",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/shortercode/file_scanner/issues"
+  },
+  "homepage": "https://github.com/shortercode/file_scanner#readme"
+}
