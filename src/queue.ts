@@ -1,11 +1,15 @@
 import { asDefined } from "ts-runtime-typecheck";
 import { deferred } from "./deferred";
 
-export function queue<T> (concurrency: number, fn: (v: T) => Promise<void> | void) {
+export function queue ({ concurrency, recover, fn }: { 
+  concurrency: number;
+  recover?: (error: unknown, location: string) => Promise<void> | void;
+  fn: (v: [string, number]) => Promise<void> | void;
+}) {
   const { promise, resolve, reject } = deferred<void>();
-  const pending: T[] = [];
+  const pending: [string, number][] = [];
   let running = 0;
-  let failed = false;
+  let stopped = false;
 
   const runThread = async () => {
     running += 1;
@@ -17,27 +21,43 @@ export function queue<T> (concurrency: number, fn: (v: T) => Promise<void> | voi
       const next = asDefined(pending.shift()); // we check above, so this will always return a value
       try {
         await fn(next);
-      } catch (e) {
-        failed = true;
-        pending.length = 0;
-        // this may be called as many times as we have active threads if they all fail
-        // but the above should mean that they won't continue past their current item
-        reject(e);
+      } catch (e: unknown) {
+        let err = e;
+        let recovered = false;
+
+        if (recover) {
+          try {
+            await recover(e, next[0]);
+            recovered = true;
+          } catch (e) {
+            err = e;
+          }
+        }
+
+        if (!recovered) {
+          // this may be called as many times as we have active threads if they all fail
+          // but the above should mean that they won't continue past their current item
+          stopped = true;
+          pending.length = 0;
+          reject(err);
+        }
+        
       }
     }
     running -= 1;
     if (running === 0) {
+      stopped = true;
       resolve();
     }
   };
 
   return {
-    add (item: T) {
-      if (failed) {
+    add (location: string, depth: number) {
+      if (stopped) {
         return; // don't add to queue or start threads if we have failed
       }
       // add to queue
-      pending.push(item);
+      pending.push([location, depth]);
       // if we aren't at our concurrency limit start a new thread
       if (running < concurrency) {
         runThread();
