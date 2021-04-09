@@ -17,10 +17,10 @@ npm install fs-inspect
 First you must create an inspector, which describes *how* you want to search. This inspector can then be used multiple searches.
 
 ```typescript
-import { createInspector, filterByExtensions } from 'fs-inspect';
+import { createInspector, filterByExtension } from 'fs-inspect';
 
 async function main() {
-  const { search } = createInspector({ filter: filterByExtensions(['png', 'jpg'])});
+  const { search } = createInspector({ filter: filterByExtension(['png', 'jpg'])});
   const imageFiles = await search('~/Pictures');
 }
 ```
