@@ -25,12 +25,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nanoporetech/file_scanner.git"
+    "url": "git+https://github.com/nanoporetech/fs-inspect.git"
   },
   "author": "Iain Shorter",
   "license": "MPL-2.0",
   "bugs": {
-    "url": "https://github.com/nanoporetech/file_scanner/issues"
+    "url": "https://github.com/nanoporetech/fs-inspect/issues"
   },
-  "homepage": "https://github.com/nanoporetech/file_scanner#readme"
+  "homepage": "https://github.com/nanoporetech/fs-inspect#readme"
 }
