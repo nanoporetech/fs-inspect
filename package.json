@@ -1,6 +1,6 @@
 {
-  "name": "file_scanner",
-  "version": "0.1.0",
+  "name": "fs-inspect",
+  "version": "1.0.0",
   "description": "directory tree scanner for Node.js",
   "main": "cjs/index.js",
   "module": "mjs/index.mjs",

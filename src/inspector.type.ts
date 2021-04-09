@@ -1,6 +1,6 @@
 import type { FileInfo } from "./FileInfo.type";
 
-export interface CrawlerOptions<T = FileInfo> {
+export interface InspectorOptions<T = FileInfo> {
   includeHidden?: boolean;
   includeFolders?: boolean;
   concurrency?: number;
@@ -11,6 +11,6 @@ export interface CrawlerOptions<T = FileInfo> {
   catch?: (error: unknown, location: string) => void | Promise<void>; 
 }
 
-export interface Crawler<T = FileInfo> {
-  crawl: (location: string) => Promise<T[]>;
+export interface Inspector<T = FileInfo> {
+  search: (location: string) => Promise<T[]>;
 }

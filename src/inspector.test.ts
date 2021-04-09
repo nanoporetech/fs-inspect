@@ -2,10 +2,10 @@ import path from 'path';
 import fs from 'fs';
 import os from 'os';
 
-import { crawler } from './crawler';
+import { createInspector } from './inspector';
 import type { FileInfo } from './FileInfo.type';
 
-describe('crawler', () => {
+describe('inspector', () => {
   /*
    Testing folder structure
    > root
@@ -174,8 +174,8 @@ describe('crawler', () => {
   });
 
   it('default behavior', async () => {
-    const { crawl } = crawler();
-    const files = await crawl(ROOT);
+    const { search } = createInspector();
+    const files = await search(ROOT);
 
     expect(files.length).toEqual(3);
 
@@ -185,16 +185,16 @@ describe('crawler', () => {
   });
 
   it('does not accept invalid concurrency value', () => {
-    expect(() => crawler({ concurrency: 0 })).toThrowError('Invalid concurrency value 0. Expected either a positive non-zero integer, or Infinity.')
+    expect(() => createInspector({ concurrency: 0 })).toThrowError('Invalid concurrency value 0. Expected either a positive non-zero integer, or Infinity.')
   });
 
   it('does not accept invalid maxDepth value', () => {
-    expect(() => crawler({ maxDepth: 0 })).toThrowError('Invalid maxDepth value 0. Expected either a positive non-zero integer, or Infinity.')
+    expect(() => createInspector({ maxDepth: 0 })).toThrowError('Invalid maxDepth value 0. Expected either a positive non-zero integer, or Infinity.')
   });
 
   it('can conditionally include folders', async () => {
-    const { crawl } = crawler({ includeFolders: true });
-    const files = await crawl(ROOT);
+    const { search } = createInspector({ includeFolders: true });
+    const files = await search(ROOT);
 
     expect(files.length).toEqual(7);
     expect(files).toContainEqual(ROOT_DESCRIPTION);
@@ -209,8 +209,8 @@ describe('crawler', () => {
   });
 
   it('can conditionally include hidden files/folders', async () => {
-    const { crawl } = crawler({ includeFolders: true, includeHidden: true });
-    const files = await crawl(ROOT);
+    const { search } = createInspector({ includeFolders: true, includeHidden: true });
+    const files = await search(ROOT);
 
     expect(files.length).toEqual(10);
     expect(files).toContainEqual(ROOT_DESCRIPTION);
@@ -228,8 +228,8 @@ describe('crawler', () => {
   });
 
   it('can conditionally include hidden files', async () => {
-    const { crawl } = crawler({ includeHidden: true });
-    const files = await crawl(ROOT);
+    const { search } = createInspector({ includeHidden: true });
+    const files = await search(ROOT);
 
     expect(files.length).toEqual(5);
 
@@ -241,8 +241,8 @@ describe('crawler', () => {
   });
 
   it('can accept a file as an entry point', async() => {
-    const { crawl } = crawler();
-    const files = await crawl(FILE_PNG);
+    const { search } = createInspector();
+    const files = await search(FILE_PNG);
 
     expect(files.length).toEqual(1);
 
@@ -259,8 +259,8 @@ describe('crawler', () => {
   });
 
   it('can accept a depth limit', async() => {
-    const { crawl } = crawler({ maxDepth: 2 });
-    const files = await crawl(ROOT);
+    const { search } = createInspector({ maxDepth: 2 });
+    const files = await search(ROOT);
 
     expect(files.length).toEqual(2);
 
@@ -269,8 +269,8 @@ describe('crawler', () => {
   });
 
   it('can accept a depth limit of 1', async() => {
-    const { crawl } = crawler({ maxDepth: 1 });
-    const files = await crawl(ROOT);
+    const { search } = createInspector({ maxDepth: 1 });
+    const files = await search(ROOT);
 
     expect(files.length).toEqual(1);
 
@@ -279,8 +279,8 @@ describe('crawler', () => {
 
   it('can filter results using a custom fn', async() => {
     const filter = ({ name }: FileInfo) => name.includes('file');
-    const { crawl } = crawler({ includeFolders: true, includeHidden: true, filter });
-    const files = await crawl(ROOT);
+    const { search } = createInspector({ includeFolders: true, includeHidden: true, filter });
+    const files = await search(ROOT);
 
     expect(files.length).toEqual(4);
 
@@ -292,8 +292,8 @@ describe('crawler', () => {
 
   it('can exclude folders using a custom fn', async() => {
     const exclude = ({ name }: FileInfo) => name === 'folder a';
-    const { crawl } = crawler({ includeFolders: true, includeHidden: true, exclude });
-    const files = await crawl(ROOT);
+    const { search } = createInspector({ includeFolders: true, includeHidden: true, exclude });
+    const files = await search(ROOT);
 
     expect(files.length).toEqual(7);
     expect(files).toContainEqual(ROOT_DESCRIPTION);
@@ -309,8 +309,8 @@ describe('crawler', () => {
 
   it('can map results using a custom fn', async() => {
     const map = ({ absolute }: FileInfo) => absolute;
-    const { crawl } = crawler({ map });
-    const files = await crawl(ROOT);
+    const { search } = createInspector({ map });
+    const files = await search(ROOT);
 
     expect(files.length).toEqual(3);
 
