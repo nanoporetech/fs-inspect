@@ -4,11 +4,11 @@ import { makeFileInfo } from './FileInfo';
 import { queue } from './queue';
 import { isValidCount } from './isValidCount';
 
-import type { Crawler, CrawlerOptions } from './Crawler.type';
+import type { Inspector, InspectorOptions } from './inspector.type';
 import type { FileInfo } from './FileInfo.type';
 
 // T is intended to be inferred, specifying a type argument without `map` breaks the contract
-export function crawler <T = FileInfo>(options: CrawlerOptions<T> = {}): Crawler<T> {
+export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}): Inspector<T> {
   const {
     exclude,
     filter,
@@ -29,7 +29,7 @@ export function crawler <T = FileInfo>(options: CrawlerOptions<T> = {}): Crawler
   }
 
   return {
-    async crawl (location: string): Promise<T[]> {
+    async search (location: string): Promise<T[]> {
       const results: T[] = [];
       const root = path.resolve(location);
 

@@ -1,3 +1,3 @@
-export type { Crawler, CrawlerOptions } from './Crawler.type';
+export type { Inspector, InspectorOptions } from './inspector.type';
 export type { FileInfo } from './FileInfo.type';
-export { crawler } from './crawler';
+export { createInspector } from './inspector';
