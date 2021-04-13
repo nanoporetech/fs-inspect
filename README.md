@@ -18,10 +18,11 @@ First you must create an inspector, which describes *how* you want to search. Th
 
 ```typescript
 import { createInspector, filterByExtension } from 'fs-inspect';
+import { homedir } from 'os';
 
 async function main() {
   const { search } = createInspector({ filter: filterByExtension(['png', 'jpg'])});
-  const imageFiles = await search('~/Pictures');
+  const imageFiles = await search(`${ homedir() }/Pictures`);
 }
 ```
 
@@ -39,6 +40,7 @@ Before each item is added to the results it can optionally be omitted using a 'f
 
 ```typescript
 import { createInspector } from 'fs-inspect';
+import { homedir } from 'os';
 
 async function main() {
   const epoch = (new Date('1 January 2021')).getTime();
@@ -47,7 +49,7 @@ async function main() {
     filter: ({ created }) => created > epoch
   });
 
-  const documents = await search('~/Documents');
+  const documents = await search(`${ homedir() }/Documents`);
 }
 ```
 
@@ -57,6 +59,7 @@ When a folder is visited an optional 'exclude' function can be used to indicate 
 
 ```typescript
 import { createInspector } from 'fs-inspect';
+import { homedir } from 'os';
 
 async function main() {
   const ignoredFolders = new Set(['dist', 'node_modules']);
@@ -66,7 +69,7 @@ async function main() {
     filter: ({ ext }) => ext === '.js'
   });
 
-  const sources = await search('~/Developer/my_project');
+  const sources = await search(`${ homedir() }/Developer/my_project`);
 }
 ```
 
@@ -76,6 +79,7 @@ The output from an inspector is normally composed of FileInfo objects. However, 
 
 ```typescript
 import { createInspector } from 'fs-inspect';
+import { homedir } from 'os';
 
 async function main() {
   const { search } = createInspector({
@@ -88,7 +92,7 @@ async function main() {
     }
   });
 
-  const stats = await search('~/Developer/my_project/assets');
+  const stats = await search(`${ homedir() }/Developer/my_project/assets`);
 }
 ```
 
