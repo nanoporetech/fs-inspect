@@ -1,4 +1,4 @@
-const EXT_REGEX = /^\.?[a-z]+$/i;
+const EXT_REGEX = /^\.?[a-z0-9]+$/i;
 
 export function filterByExtension(extensions: Iterable<string>): (info: { ext: string }) => boolean {
   const list = new Set();
