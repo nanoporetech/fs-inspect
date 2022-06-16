@@ -192,6 +192,10 @@ describe('inspector', () => {
     expect(() => createInspector({ maxDepth: 0 })).toThrowError('Invalid maxDepth value 0. Expected either a positive non-zero integer, or Infinity.')
   });
 
+  it('does not accept invalid minDepth value', () => {
+    expect(() => createInspector({ minDepth: 3.14 })).toThrowError('Invalid minDepth value 3.14. Expected either a positive integer, or Infinity.')
+  });
+
   it('does not accept overlapping maxDepth/minDepth values', () => {
     expect(() => createInspector({ maxDepth: 2, minDepth: 3 })).toThrowError('Invalid depth range. Expected minDepth to be less than or equal to maxDepth.')
   });
