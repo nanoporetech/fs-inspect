@@ -15,6 +15,7 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
     map,
     concurrency = 8,
     maxDepth = Infinity,
+    minDepth = 0,
     catch: recover,
     includeFolders = false,
     includeHidden = false
@@ -26,6 +27,14 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
 
   if (!isValidCount(maxDepth)) {
     throw new Error(`Invalid maxDepth value ${maxDepth}. Expected either a positive non-zero integer, or Infinity.`);
+  }
+
+  if (minDepth !== 0 && !isValidCount(minDepth)) {
+    throw new Error(`Invalid minDepth value ${minDepth}. Expected either a positive integer, or Infinity.`);
+  }
+
+  if (minDepth > maxDepth) {
+    throw new Error(`Invalid depth range. Expected minDepth to be less than or equal to maxDepth.`)
   }
 
   return {
@@ -53,6 +62,11 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
             return; // unless we are set to include folders in the result exit before we get to the filter stage
           }
         }
+
+        if (depth < minDepth) {
+          return; // if our current depth is less than the minDepth then exit before we get to the filter stage
+        }
+
         // decide if we should include this entry in the result list
         if (!filter || await filter(info)) {
           if (map) {
