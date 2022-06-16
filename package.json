@@ -6,17 +6,17 @@
   "module": "mjs/index.mjs",
   "types": "mjs/index.d.ts",
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^11.2.0",
-    "@types/jest": "^26.0.14",
-    "@typescript-eslint/eslint-plugin": "^4.3.0",
-    "@typescript-eslint/parser": "^4.3.0",
-    "eslint": "^7.10.0",
-    "jest": "^26.5.0",
-    "rollup": "^2.32.0",
-    "rollup-plugin-typescript2": "^0.28.0",
-    "ts-jest": "^26.4.1",
-    "ts-runtime-typecheck": "^2.2.0",
-    "typescript": "^4.1.2"
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@types/jest": "^28.1.1",
+    "@typescript-eslint/eslint-plugin": "^5.28.0",
+    "@typescript-eslint/parser": "^5.28.0",
+    "eslint": "^8.17.0",
+    "jest": "^28.1.1",
+    "rollup": "^2.75.6",
+    "rollup-plugin-typescript2": "^0.32.1",
+    "ts-jest": "^28.0.5",
+    "ts-runtime-typecheck": "^2.6.0",
+    "typescript": "^4.7.3"
   },
   "scripts": {
     "test": "jest --verbose --coverage",
