@@ -1,4 +1,4 @@
-import type { FileInfo } from "./FileInfo.type";
+import type { FileInfo } from './FileInfo.type';
 
 export interface InspectorOptions<T = FileInfo> {
   includeHidden?: boolean;

@@ -120,7 +120,7 @@ describe('FileInfo', () => {
       name: 'file',
       ext: '.txt',
     }));
-  })
+  });
   afterAll(async () => {
     await fs.promises.rm(tmp, { recursive: true });
   });

@@ -1,5 +1,5 @@
-import { asDefined } from "ts-runtime-typecheck";
-import { deferred } from "./deferred";
+import { asDefined } from 'ts-runtime-typecheck';
+import { deferred } from './deferred';
 
 export function queue ({ concurrency, recover, fn }: { 
   concurrency: number;

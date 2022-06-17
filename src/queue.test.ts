@@ -101,11 +101,11 @@ describe('queue', () => {
     let count = 0;
     let max = 0;
     const { complete, add } = queue({ concurrency, async fn () {
-        count += 1;
-        max = Math.max(count, max);
-        await delay(5);
-        count -=1; 
-      } 
+      count += 1;
+      max = Math.max(count, max);
+      await delay(5);
+      count -=1; 
+    } 
     });
     for (let i = 0; i < concurrency * 5; i += 1) {
       add('fake', 0);

@@ -33,7 +33,7 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
 
 
   if (isDefined(type) && isDefined(includeFolders)) {
-    throw new Error(`Clashing arguments "type" and "includeFolder" specified. Use "type: all" to include files and folders in your output.`);
+    throw new Error('Clashing arguments "type" and "includeFolder" specified. Use "type: all" to include files and folders in your output.');
   }
 
   let includeTypes = type ?? 'files';
@@ -47,7 +47,7 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
   }
 
   if (minDepth > maxDepth) {
-    throw new Error(`Invalid depth range. Expected minDepth to be less than or equal to maxDepth.`)
+    throw new Error('Invalid depth range. Expected minDepth to be less than or equal to maxDepth.');
   }
 
   return {

@@ -56,7 +56,7 @@ describe('inspector', () => {
     FILE_TXT = path.join(FOLDER_B, 'file.txt');
     FILE_FQ = path.join(ROOT, 'another.file.fastq');
     FILE_HIDDEN = path.join(ROOT, '.hidden file.json');
-    FILE_OBSCURED = path.join(FOLDER_HIDDEN, 'obscured file.tar.gz')
+    FILE_OBSCURED = path.join(FOLDER_HIDDEN, 'obscured file.tar.gz');
     
     await fs.promises.mkdir(FOLDER_A);
     await fs.promises.mkdir(FOLDER_B);
@@ -185,19 +185,19 @@ describe('inspector', () => {
   });
 
   it('does not accept invalid concurrency value', () => {
-    expect(() => createInspector({ concurrency: 0 })).toThrowError('Invalid concurrency value 0. Expected either a positive non-zero integer, or Infinity.')
+    expect(() => createInspector({ concurrency: 0 })).toThrowError('Invalid concurrency value 0. Expected either a positive non-zero integer, or Infinity.');
   });
 
   it('does not accept invalid maxDepth value', () => {
-    expect(() => createInspector({ maxDepth: 0 })).toThrowError('Invalid maxDepth value 0. Expected either a positive non-zero integer, or Infinity.')
+    expect(() => createInspector({ maxDepth: 0 })).toThrowError('Invalid maxDepth value 0. Expected either a positive non-zero integer, or Infinity.');
   });
 
   it('does not accept invalid minDepth value', () => {
-    expect(() => createInspector({ minDepth: 3.14 })).toThrowError('Invalid minDepth value 3.14. Expected either a positive integer, or Infinity.')
+    expect(() => createInspector({ minDepth: 3.14 })).toThrowError('Invalid minDepth value 3.14. Expected either a positive integer, or Infinity.');
   });
 
   it('does not accept overlapping maxDepth/minDepth values', () => {
-    expect(() => createInspector({ maxDepth: 2, minDepth: 3 })).toThrowError('Invalid depth range. Expected minDepth to be less than or equal to maxDepth.')
+    expect(() => createInspector({ maxDepth: 2, minDepth: 3 })).toThrowError('Invalid depth range. Expected minDepth to be less than or equal to maxDepth.');
   });
 
   it('can conditionally include folders', async () => {
@@ -256,7 +256,7 @@ describe('inspector', () => {
   });
 
   it('does not allow both type and includeFolder to be specified', () => {
-    expect(() => createInspector({ type: 'all', includeFolders: true })).toThrow('Clashing arguments "type" and "includeFolder" specified. Use "type: all" to include files and folders in your output.')
+    expect(() => createInspector({ type: 'all', includeFolders: true })).toThrow('Clashing arguments "type" and "includeFolder" specified. Use "type: all" to include files and folders in your output.');
   });
 
   it('can conditionally include hidden files/folders', async () => {
