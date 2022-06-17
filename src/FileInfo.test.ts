@@ -22,10 +22,10 @@ describe('FileInfo', () => {
      .hidden file
 
   */
-  const root = path.join(os.tmpdir(), 'FileInfo.test-');
   let tmp = '', now = 0;
   beforeAll(async () => {
-    tmp = await fs.promises.mkdtemp(root);
+    tmp = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'FileInfo_test-'));
+
     now = Date.now();
     await fs.promises.mkdir(path.join(tmp, 'folder a'));
     await fs.promises.mkdir(path.join(tmp, 'folder b'));
@@ -122,6 +122,6 @@ describe('FileInfo', () => {
     }));
   })
   afterAll(async () => {
-    await fs.promises.rm(root, { recursive: true });
+    await fs.promises.rm(tmp, { recursive: true });
   });
 });

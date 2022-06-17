@@ -8,6 +8,7 @@ export interface InspectorOptions<T = FileInfo> {
   includeFolders?: boolean;
   type?: 'files' | 'folders' | 'all';
   concurrency?: number;
+  minDepth?: number;
   maxDepth?: number;
   exclude?: (info: FileInfo) => boolean | Promise<boolean>;
   filter?: (info: FileInfo) => boolean | Promise<boolean>;

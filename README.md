@@ -121,6 +121,8 @@ const normal = createInspector({ concurrency: 8 });
 
 If you have a very deep file tree and you are only interested in the top couple of levels you can specify a depth limit with the `maxDepth` option. By default there is no limit (Infinity). The minimum value is 1, which is *just* the direct children of the target folder.
 
+Additionally if you are only interested in the results inside a subfolder then `minDepth` can be used to filter out results from the top levels. It defaults to 0 which indicates the inclusion of the root entry.
+
 ## Hidden files/folders
 
 Hidden files/folders ( ones whose name starts with a full stop ) are skipped by default, in the case of folders the children will also not be visited. The option `includeHidden` can be used to disable this behavior, ensuring all files are visited.
@@ -189,6 +191,10 @@ const ignorePermissionError = createInspector({ catch (err, location) {
 - ### InspectorOptions.maxDepth
 
   An optional positive non-zero integer which specified the maximum search depth through the folder tree. Infinity indicates no limit. Default value is Infinity.
+
+- ### InspectorOptions.minDepth
+
+  An optional positive integer which specified the minimum search depth through the folder tree. Infinity indicates no limit. 0 indicates all entries should be included. Default value is 0.
 
 - ### InspectorOptions.exclude
 
