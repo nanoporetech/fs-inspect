@@ -2,7 +2,11 @@ import type { FileInfo } from "./FileInfo.type";
 
 export interface InspectorOptions<T = FileInfo> {
   includeHidden?: boolean;
+  /** 
+   * @deprecated use `type: 'all'` instead
+   */
   includeFolders?: boolean;
+  type?: 'files' | 'folders' | 'all';
   concurrency?: number;
   minDepth?: number;
   maxDepth?: number;

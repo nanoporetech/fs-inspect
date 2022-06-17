@@ -216,6 +216,49 @@ describe('inspector', () => {
     expect(files).toContainEqual(FOLDER_N_DESCRIPTION);
   });
 
+  it('type: "all" includes folders and files', async () => {
+    const { search } = createInspector({ type: 'all' });
+    const files = await search(ROOT);
+
+    expect(files.length).toEqual(7);
+    expect(files).toContainEqual(ROOT_DESCRIPTION);
+
+    expect(files).toContainEqual(FILE_TXT_DESCRIPTION);
+    expect(files).toContainEqual(FILE_FQ_DESCRIPTION);
+    expect(files).toContainEqual(FILE_PNG_DESCRIPTION);
+
+    expect(files).toContainEqual(FOLDER_A_DESCRIPTION);
+    expect(files).toContainEqual(FOLDER_B_DESCRIPTION);
+    expect(files).toContainEqual(FOLDER_N_DESCRIPTION);
+  });
+
+  it('type: "folders" includes only folders', async () => {
+    const { search } = createInspector({ type: 'folders' });
+    const files = await search(ROOT);
+
+    expect(files.length).toEqual(4);
+    expect(files).toContainEqual(ROOT_DESCRIPTION);
+
+    expect(files).toContainEqual(FOLDER_A_DESCRIPTION);
+    expect(files).toContainEqual(FOLDER_B_DESCRIPTION);
+    expect(files).toContainEqual(FOLDER_N_DESCRIPTION);
+  });
+
+  it('type: "files" includes only files', async () => {
+    const { search } = createInspector({ type: 'files' });
+    const files = await search(ROOT);
+
+    expect(files.length).toEqual(3);
+
+    expect(files).toContainEqual(FILE_TXT_DESCRIPTION);
+    expect(files).toContainEqual(FILE_FQ_DESCRIPTION);
+    expect(files).toContainEqual(FILE_PNG_DESCRIPTION);
+  });
+
+  it('does not allow both type and includeFolder to be specified', () => {
+    expect(() => createInspector({ type: 'all', includeFolders: true })).toThrow('Clashing arguments "type" and "includeFolder" specified. Use "type: all" to include files and folders in your output.')
+  });
+
   it('can conditionally include hidden files/folders', async () => {
     const { search } = createInspector({ includeFolders: true, includeHidden: true });
     const files = await search(ROOT);

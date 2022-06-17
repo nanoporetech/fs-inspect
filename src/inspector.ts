@@ -6,6 +6,7 @@ import { isValidCount } from './isValidCount';
 
 import type { Inspector, InspectorOptions } from './inspector.type';
 import type { FileInfo } from './FileInfo.type';
+import { isDefined } from 'ts-runtime-typecheck';
 
 // T is intended to be inferred, specifying a type argument without `map` breaks the contract
 export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}): Inspector<T> {
@@ -17,7 +18,8 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
     maxDepth = Infinity,
     minDepth = 0,
     catch: recover,
-    includeFolders = false,
+    type,
+    includeFolders,
     includeHidden = false
   } = options;
 
@@ -27,6 +29,17 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
 
   if (!isValidCount(maxDepth)) {
     throw new Error(`Invalid maxDepth value ${maxDepth}. Expected either a positive non-zero integer, or Infinity.`);
+  }
+
+
+  if (isDefined(type) && isDefined(includeFolders)) {
+    throw new Error(`Clashing arguments "type" and "includeFolder" specified. Use "type: all" to include files and folders in your output.`);
+  }
+
+  let includeTypes = type ?? 'files';
+
+  if (includeFolders) {
+    includeTypes = 'all';
   }
 
   if (minDepth !== 0 && !isValidCount(minDepth)) {
@@ -58,9 +71,13 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
               add(path.join(relative, entry), depth + 1);
             }
           }
-          if (!includeFolders) {
+          if (includeTypes === 'files') {
             return; // unless we are set to include folders in the result exit before we get to the filter stage
           }
+        }
+
+        else if (includeTypes === 'folders') {
+          return; // unless we are set to include files in the result exit before we get to the filter stage
         }
 
         if (depth < minDepth) {

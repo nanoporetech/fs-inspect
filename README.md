@@ -36,7 +36,7 @@ There are several ways to manipulate the results as they are being generated wit
 
 ### Filtering
 
-Before each item is added to the results it can optionally be omitted using a 'filter' function. If 'includeFolders' is true then folders will be passed to the filter function, but the filter will not prevent the children of the folder from being visited.
+Before each item is added to the results it can optionally be omitted using a 'filter' function. If folders are included in the output then they will be passed to the filter function, but the filter will not prevent the children of the folder from being visited.
 
 ```typescript
 import { createInspector } from 'fs-inspect';
@@ -55,7 +55,7 @@ async function main() {
 
 ### Excluding
 
-When a folder is visited an optional 'exclude' function can be used to indicate that the children of the folder should be skipped, which has obvious performance advantages if you wish to skip large parts of the file tree. If 'includeFolders' is true then excluded folders will not be included in the results, so you will not have to use 'filter' to skip them.
+When a folder is visited an optional 'exclude' function can be used to indicate that the children of the folder should be skipped, which has obvious performance advantages if you wish to skip large parts of the file tree. If folders are included in the output then excluded folders will not be included in the results, so you will not have to use 'filter' to skip them.
 
 ```typescript
 import { createInspector } from 'fs-inspect';
@@ -119,7 +119,7 @@ const normal = createInspector({ concurrency: 8 });
 
 ## Depth limiting
 
-If you have a very deep file tree and you are only interested in the top couple of levels you can specify a depth limit with the `maxDepth` option. By default there is no limit (Infinity). The minimum value is 1, which is _just_ the direct children of the target folder.
+If you have a very deep file tree and you are only interested in the top couple of levels you can specify a depth limit with the `maxDepth` option. By default there is no limit (Infinity). The minimum value is 1, which is *just* the direct children of the target folder.
 
 Additionally if you are only interested in the results inside a subfolder then `minDepth` can be used to filter out results from the top levels. It defaults to 0 which indicates the inclusion of the root entry.
 
@@ -129,11 +129,11 @@ Hidden files/folders ( ones whose name starts with a full stop ) are skipped by 
 
 ## Folders in output
 
-Folders are not added to the output by default, you can include them using the `includeFolders` option.
+Folders are not added to the output by default, you can include them by setting the `type` option to `all` or `folders`. These include files and folders, or just folders respectively.
 
 ## Root entry
 
-If the target location for the search is a file, then only that file will be included in the output. Providing that it passes any filters you have specified. If it's a folder and `includeFolders` is set then it will be included in the output. In both cases the relative path will be an empty string, indicating that it is the root of the tree.
+If the target location for the search is a file, then only that file will be included in the output. Providing that it passes any filters you have specified. If it's a folder and are included in the output normally then it will be included in the output. In both cases the relative path will be an empty string, indicating that it is the root of the tree.
 
 ## Error recovery
 
@@ -176,9 +176,13 @@ const ignorePermissionError = createInspector({ catch (err, location) {
 
   An optional boolean flag that causes files and folders whose name begins with full stop should be visited while searching. Default value is false.
 
-- ### InspectorOptions.includeFolders
+- ### InspectorOptions.type
   
-  An optional boolean flag that causes folders to be included in the output. Default value is false.
+  An optional string which indicates if `'files'`, `'folders'` or `'all'` should be included in the output. Default value is `'files'`.
+
+- ### InspectorOptions.includeFolders
+
+  **Depreciated** optional boolean flag that indicates that folders should be included in the output. Use `type: 'all'` instead.
 
 - ### InspectorOptions.concurrency
   
