@@ -192,6 +192,14 @@ describe('inspector', () => {
     expect(() => createInspector({ maxDepth: 0 })).toThrowError('Invalid maxDepth value 0. Expected either a positive non-zero integer, or Infinity.')
   });
 
+  it('does not accept invalid minDepth value', () => {
+    expect(() => createInspector({ minDepth: 3.14 })).toThrowError('Invalid minDepth value 3.14. Expected either a positive integer, or Infinity.')
+  });
+
+  it('does not accept overlapping maxDepth/minDepth values', () => {
+    expect(() => createInspector({ maxDepth: 2, minDepth: 3 })).toThrowError('Invalid depth range. Expected minDepth to be less than or equal to maxDepth.')
+  });
+
   it('can conditionally include folders', async () => {
     const { search } = createInspector({ includeFolders: true });
     const files = await search(ROOT);
@@ -258,7 +266,7 @@ describe('inspector', () => {
     }));
   });
 
-  it('can accept a depth limit', async() => {
+  it('can accept a max depth limit', async() => {
     const { search } = createInspector({ maxDepth: 2 });
     const files = await search(ROOT);
 
@@ -268,7 +276,17 @@ describe('inspector', () => {
     expect(files).toContainEqual(FILE_FQ_DESCRIPTION);
   });
 
-  it('can accept a depth limit of 1', async() => {
+  it('can accept a min depth limit', async() => {
+    const { search } = createInspector({ minDepth: 2 });
+    const files = await search(ROOT);
+
+    expect(files.length).toEqual(2);
+
+    expect(files).toContainEqual(FILE_PNG_DESCRIPTION);
+    expect(files).toContainEqual(FILE_TXT_DESCRIPTION);
+  });
+
+  it('can accept a max depth limit of 1', async() => {
     const { search } = createInspector({ maxDepth: 1 });
     const files = await search(ROOT);
 
