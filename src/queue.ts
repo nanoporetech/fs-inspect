@@ -5,7 +5,7 @@ export function queue ({ concurrency, recover, fn }: {
   concurrency: number;
   recover?: (error: unknown, location: string) => Promise<void> | void;
   fn: (v: [string, number]) => Promise<void> | void;
-}): { add (location: string, depth: number): void; complete: Promise<void> } {
+}): { add: (location: string, depth: number) => void; complete: Promise<void> } {
   const { promise, resolve, reject } = deferred<void>();
   const pending: [string, number][] = [];
   let running = 0;

@@ -7,7 +7,9 @@ function delay (n: number) {
 describe('queue', () => {
 
   test('unused queue does not resolve', async () => {
-    const { complete } = queue({ concurrency: 1, fn () {}});
+    const { complete } = queue({ concurrency: 1, fn () {
+      // no-op
+    }});
     const res = await Promise.race([
       complete,
       delay(10).then(() => 'yay'),
@@ -20,7 +22,7 @@ describe('queue', () => {
     const { complete, add } = queue({ concurrency: 1, async fn ([txt]) {
       started += 1;
       if (txt === 'fail') {
-        throw new Error('woops');
+        return Promise.reject(new Error('woops'));
       }
     }});
     add('pass', 0);
@@ -38,14 +40,18 @@ describe('queue', () => {
   test('recover option allows continuation when error is thrown', async () => {
     let started = 0;
     let errors = 0;
-    const { complete, add } = queue({ concurrency: 1, async fn ([txt]) {
-      started += 1;
-      if (txt === 'fail') {
-        throw new Error('woops');
+    const { complete, add } = queue({ 
+      concurrency: 1, 
+      async fn ([txt]) {
+        started += 1;
+        if (txt === 'fail') {
+          return Promise.reject(new Error('woops'));
+        }
+      }, 
+      recover () {
+        errors += 1;
       }
-    }, recover () {
-      errors += 1;
-    }});
+    });
     add('pass', 0);
     add('pass', 0);
     add('pass', 0);
@@ -64,7 +70,7 @@ describe('queue', () => {
     const { complete, add } = queue({ concurrency: 1, async fn ([txt]) {
       started += 1;
       if (txt === 'fail') {
-        throw new Error('woops');
+        return Promise.reject(new Error('woops'));
       }
     }, recover () {
       throw new Error('spam');
@@ -86,10 +92,11 @@ describe('queue', () => {
     let started = 0;
     const { complete, add } = queue({ concurrency: 1, async fn () {
       started += 1;
+      return Promise.resolve();
     }});
     add('pass', 0);
     
-    await expect(complete);
+    await complete;
     expect(started).toEqual(1);
     add('pass', 0);
     await delay(15);
