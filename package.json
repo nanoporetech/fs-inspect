@@ -20,7 +20,7 @@
   },
   "scripts": {
     "test": "jest --verbose --coverage",
-    "lint": "eslint",
+    "lint": "eslint src",
     "build": "rollup -c && cp ./package.json ./dist/package.json && cp ./README.md ./dist/README.md"
   },
   "repository": {

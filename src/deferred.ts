@@ -11,6 +11,7 @@ export function deferred<T> (): { promise: Promise<T>; resolve: (v: T) => void; 
   });
   
   // resolve/reject are "potentially" not assigned to, but always are
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore 
   return { promise, resolve, reject };
 }

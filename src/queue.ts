@@ -1,11 +1,11 @@
-import { asDefined } from "ts-runtime-typecheck";
-import { deferred } from "./deferred";
+import { asDefined } from 'ts-runtime-typecheck';
+import { deferred } from './deferred';
 
 export function queue ({ concurrency, recover, fn }: { 
   concurrency: number;
   recover?: (error: unknown, location: string) => Promise<void> | void;
   fn: (v: [string, number]) => Promise<void> | void;
-}) {
+}): { add: (location: string, depth: number) => void; complete: Promise<void> } {
   const { promise, resolve, reject } = deferred<void>();
   const pending: [string, number][] = [];
   let running = 0;
@@ -60,7 +60,7 @@ export function queue ({ concurrency, recover, fn }: {
       pending.push([location, depth]);
       // if we aren't at our concurrency limit start a new thread
       if (running < concurrency) {
-        runThread();
+        void runThread();
       }
     },
     complete: promise,

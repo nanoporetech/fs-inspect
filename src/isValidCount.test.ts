@@ -26,4 +26,4 @@ describe('isValidCount', () => {
   it('does not accept floating point values', () => {
     expect(isValidCount(-0.2)).toBeFalsy();
   });
-})
+});

@@ -20,280 +20,280 @@ describe('inspector', () => {
      .hidden file
 
   */
-  let ROOT = '';
-  let FOLDER_A = '';
-  let FOLDER_N = '';
-  let FOLDER_B = '';
-  let FOLDER_HIDDEN = '';
+  let rootFolder = '';
+  let folderA = '';
+  let folderN = '';
+  let folderB = '';
+  let folderHidden = '';
 
-  let FILE_PNG = '';
-  let FILE_TXT = '';
-  let FILE_FQ = '';
-  let FILE_HIDDEN = '';
-  let FILE_OBSCURED = '';
+  let filePNG = '';
+  let fileTXT = '';
+  let fileFQ = '';
+  let fileHidden = '';
+  let fileObscured = '';
 
-  let ROOT_DESCRIPTION = expect.objectContaining({});
-  let FOLDER_A_DESCRIPTION = expect.objectContaining({});
-  let FOLDER_N_DESCRIPTION = expect.objectContaining({});
-  let FOLDER_B_DESCRIPTION = expect.objectContaining({});
-  let FOLDER_HIDDEN_DESCRIPTION = expect.objectContaining({});
+  let rootDescription = expect.objectContaining({}) as Partial<FileInfo>;
+  let folderADescription = expect.objectContaining({}) as Partial<FileInfo>;
+  let folderNDescription = expect.objectContaining({}) as Partial<FileInfo>;
+  let folderBDescription = expect.objectContaining({}) as Partial<FileInfo>;
+  let folderHiddenDescription = expect.objectContaining({}) as Partial<FileInfo>;
 
-  let FILE_PNG_DESCRIPTION = expect.objectContaining({});
-  let FILE_TXT_DESCRIPTION = expect.objectContaining({});
-  let FILE_FQ_DESCRIPTION = expect.objectContaining({});
-  let FILE_HIDDEN_DESCRIPTION = expect.objectContaining({});
-  let FILE_OBSCURED_DESCRIPTION = expect.objectContaining({});
+  let filePNGDescription = expect.objectContaining({}) as Partial<FileInfo>;
+  let fileTXTDescription = expect.objectContaining({}) as Partial<FileInfo>;
+  let fileFQDescription = expect.objectContaining({}) as Partial<FileInfo>;
+  let fileHiddenDescription = expect.objectContaining({}) as Partial<FileInfo>;
+  let fileObscuredDescription = expect.objectContaining({}) as Partial<FileInfo>;
 
   beforeAll(async () => {
 
-    ROOT = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'FileInfo_test-'));
-    FOLDER_A = path.join(ROOT, 'folder a');
-    FOLDER_N = path.join(FOLDER_A, 'folder n');
-    FOLDER_B = path.join(ROOT, 'folder b');
-    FOLDER_HIDDEN = path.join(ROOT, '.hidden folder');
+    rootFolder = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'FileInfo_test-'));
+    folderA = path.join(rootFolder, 'folder a');
+    folderN = path.join(folderA, 'folder n');
+    folderB = path.join(rootFolder, 'folder b');
+    folderHidden = path.join(rootFolder, '.hidden folder');
 
-    FILE_PNG = path.join(FOLDER_N, 'example.png');
-    FILE_TXT = path.join(FOLDER_B, 'file.txt');
-    FILE_FQ = path.join(ROOT, 'another.file.fastq');
-    FILE_HIDDEN = path.join(ROOT, '.hidden file.json');
-    FILE_OBSCURED = path.join(FOLDER_HIDDEN, 'obscured file.tar.gz')
+    filePNG = path.join(folderN, 'example.png');
+    fileTXT = path.join(folderB, 'file.txt');
+    fileFQ = path.join(rootFolder, 'another.file.fastq');
+    fileHidden = path.join(rootFolder, '.hidden file.json');
+    fileObscured = path.join(folderHidden, 'obscured file.tar.gz');
     
-    await fs.promises.mkdir(FOLDER_A);
-    await fs.promises.mkdir(FOLDER_B);
-    await fs.promises.mkdir(FOLDER_HIDDEN);
-    await fs.promises.mkdir(FOLDER_N);
+    await fs.promises.mkdir(folderA);
+    await fs.promises.mkdir(folderB);
+    await fs.promises.mkdir(folderHidden);
+    await fs.promises.mkdir(folderN);
   
-    await fs.promises.writeFile(FILE_TXT, 'hello world');
-    await fs.promises.writeFile(FILE_FQ, 'this is another file with some text in');
-    await fs.promises.writeFile(FILE_HIDDEN, 'secret');
-    await fs.promises.writeFile(FILE_PNG, 'not actually a PNG');
-    await fs.promises.writeFile(FILE_OBSCURED, 'not actually a tarball');
+    await fs.promises.writeFile(fileTXT, 'hello world');
+    await fs.promises.writeFile(fileFQ, 'this is another file with some text in');
+    await fs.promises.writeFile(fileHidden, 'secret');
+    await fs.promises.writeFile(filePNG, 'not actually a PNG');
+    await fs.promises.writeFile(fileObscured, 'not actually a tarball');
 
-    ROOT_DESCRIPTION = expect.objectContaining({
+    rootDescription = expect.objectContaining({
       isDirectory: true,
       hidden: false,
       relative: '',
-      absolute: ROOT,
+      absolute: rootFolder,
       size: 0,
-    });
-    FOLDER_A_DESCRIPTION = expect.objectContaining({
+    }) as Partial<FileInfo>;
+    folderADescription = expect.objectContaining({
       isDirectory: true,
       hidden: false,
       relative: 'folder a',
-      absolute: FOLDER_A,
+      absolute: folderA,
       size: 0,
       base: 'folder a',
       name: 'folder a',
       ext: '',
-    });
-    FOLDER_N_DESCRIPTION = expect.objectContaining({
+    }) as Partial<FileInfo>;
+    folderNDescription = expect.objectContaining({
       isDirectory: true,
       hidden: false,
       relative: 'folder a/folder n',
-      absolute: FOLDER_N,
+      absolute: folderN,
       size: 0,
       base: 'folder n',
       name: 'folder n',
       ext: '',
-    });
-    FOLDER_B_DESCRIPTION = expect.objectContaining({
+    }) as Partial<FileInfo>;
+    folderBDescription = expect.objectContaining({
       isDirectory: true,
       hidden: false,
       relative: 'folder b',
-      absolute: FOLDER_B,
+      absolute: folderB,
       size: 0,
       base: 'folder b',
       name: 'folder b',
       ext: '',
-    });
-    FOLDER_HIDDEN_DESCRIPTION = expect.objectContaining({
+    }) as Partial<FileInfo>;
+    folderHiddenDescription = expect.objectContaining({
       isDirectory: true,
       hidden: true,
       relative: '.hidden folder',
-      absolute: FOLDER_HIDDEN,
+      absolute: folderHidden,
       size: 0,
       base: '.hidden folder',
       name: '.hidden folder',
       ext: '',
-    });
+    }) as Partial<FileInfo>;
   
-    FILE_PNG_DESCRIPTION = expect.objectContaining({
+    filePNGDescription = expect.objectContaining({
       isDirectory: false,
       hidden: false,
       relative: 'folder a/folder n/example.png',
-      absolute: FILE_PNG,
+      absolute: filePNG,
       size: 18,
       base: 'example.png',
       name: 'example',
       ext: '.png',
-    });
-    FILE_TXT_DESCRIPTION = expect.objectContaining({
+    }) as Partial<FileInfo>;
+    fileTXTDescription = expect.objectContaining({
       isDirectory: false,
       hidden: false,
       relative: 'folder b/file.txt',
-      absolute: FILE_TXT,
+      absolute: fileTXT,
       size: 11,
       base: 'file.txt',
       name: 'file',
       ext: '.txt',
-    });
-    FILE_FQ_DESCRIPTION = expect.objectContaining({
+    }) as Partial<FileInfo>;
+    fileFQDescription = expect.objectContaining({
       isDirectory: false,
       hidden: false,
       relative: 'another.file.fastq',
-      absolute: FILE_FQ,
+      absolute: fileFQ,
       size: 38,
       base: 'another.file.fastq',
       name: 'another.file',
       ext: '.fastq',
-    });
-    FILE_HIDDEN_DESCRIPTION = expect.objectContaining({
+    }) as Partial<FileInfo>;
+    fileHiddenDescription = expect.objectContaining({
       isDirectory: false,
       hidden: true,
       relative: '.hidden file.json',
-      absolute: FILE_HIDDEN,
+      absolute: fileHidden,
       size: 6,
       base: '.hidden file.json',
       name: '.hidden file',
       ext: '.json',
-    });
-    FILE_OBSCURED_DESCRIPTION = expect.objectContaining({
+    }) as Partial<FileInfo>;
+    fileObscuredDescription = expect.objectContaining({
       isDirectory: false,
       hidden: false,
       relative: '.hidden folder/obscured file.tar.gz',
-      absolute: FILE_OBSCURED,
+      absolute: fileObscured,
       size: 22,
       base: 'obscured file.tar.gz',
       name: 'obscured file.tar',
       ext: '.gz',
-    });
+    }) as Partial<FileInfo>;
 
   });
   afterAll(async () => {
-    await fs.promises.rm(ROOT, { recursive: true });
+    await fs.promises.rm(rootFolder, { recursive: true });
   });
 
   it('default behavior', async () => {
     const { search } = createInspector();
-    const files = await search(ROOT);
+    const files = await search(rootFolder);
 
     expect(files.length).toEqual(3);
 
-    expect(files).toContainEqual(FILE_TXT_DESCRIPTION);
-    expect(files).toContainEqual(FILE_FQ_DESCRIPTION);
-    expect(files).toContainEqual(FILE_PNG_DESCRIPTION);
+    expect(files).toContainEqual(fileTXTDescription);
+    expect(files).toContainEqual(fileFQDescription);
+    expect(files).toContainEqual(filePNGDescription);
   });
 
   it('does not accept invalid concurrency value', () => {
-    expect(() => createInspector({ concurrency: 0 })).toThrowError('Invalid concurrency value 0. Expected either a positive non-zero integer, or Infinity.')
+    expect(() => createInspector({ concurrency: 0 })).toThrowError('Invalid concurrency value 0. Expected either a positive non-zero integer, or Infinity.');
   });
 
   it('does not accept invalid maxDepth value', () => {
-    expect(() => createInspector({ maxDepth: 0 })).toThrowError('Invalid maxDepth value 0. Expected either a positive non-zero integer, or Infinity.')
+    expect(() => createInspector({ maxDepth: 0 })).toThrowError('Invalid maxDepth value 0. Expected either a positive non-zero integer, or Infinity.');
   });
 
   it('does not accept invalid minDepth value', () => {
-    expect(() => createInspector({ minDepth: 3.14 })).toThrowError('Invalid minDepth value 3.14. Expected either a positive integer, or Infinity.')
+    expect(() => createInspector({ minDepth: 3.14 })).toThrowError('Invalid minDepth value 3.14. Expected either a positive integer, or Infinity.');
   });
 
   it('does not accept overlapping maxDepth/minDepth values', () => {
-    expect(() => createInspector({ maxDepth: 2, minDepth: 3 })).toThrowError('Invalid depth range. Expected minDepth to be less than or equal to maxDepth.')
+    expect(() => createInspector({ maxDepth: 2, minDepth: 3 })).toThrowError('Invalid depth range. Expected minDepth to be less than or equal to maxDepth.');
   });
 
   it('can conditionally include folders', async () => {
     const { search } = createInspector({ includeFolders: true });
-    const files = await search(ROOT);
+    const files = await search(rootFolder);
 
     expect(files.length).toEqual(7);
-    expect(files).toContainEqual(ROOT_DESCRIPTION);
+    expect(files).toContainEqual(rootDescription);
 
-    expect(files).toContainEqual(FILE_TXT_DESCRIPTION);
-    expect(files).toContainEqual(FILE_FQ_DESCRIPTION);
-    expect(files).toContainEqual(FILE_PNG_DESCRIPTION);
+    expect(files).toContainEqual(fileTXTDescription);
+    expect(files).toContainEqual(fileFQDescription);
+    expect(files).toContainEqual(filePNGDescription);
 
-    expect(files).toContainEqual(FOLDER_A_DESCRIPTION);
-    expect(files).toContainEqual(FOLDER_B_DESCRIPTION);
-    expect(files).toContainEqual(FOLDER_N_DESCRIPTION);
+    expect(files).toContainEqual(folderADescription);
+    expect(files).toContainEqual(folderBDescription);
+    expect(files).toContainEqual(folderNDescription);
   });
 
   it('type: "all" includes folders and files', async () => {
     const { search } = createInspector({ type: 'all' });
-    const files = await search(ROOT);
+    const files = await search(rootFolder);
 
     expect(files.length).toEqual(7);
-    expect(files).toContainEqual(ROOT_DESCRIPTION);
+    expect(files).toContainEqual(rootDescription);
 
-    expect(files).toContainEqual(FILE_TXT_DESCRIPTION);
-    expect(files).toContainEqual(FILE_FQ_DESCRIPTION);
-    expect(files).toContainEqual(FILE_PNG_DESCRIPTION);
+    expect(files).toContainEqual(fileTXTDescription);
+    expect(files).toContainEqual(fileFQDescription);
+    expect(files).toContainEqual(filePNGDescription);
 
-    expect(files).toContainEqual(FOLDER_A_DESCRIPTION);
-    expect(files).toContainEqual(FOLDER_B_DESCRIPTION);
-    expect(files).toContainEqual(FOLDER_N_DESCRIPTION);
+    expect(files).toContainEqual(folderADescription);
+    expect(files).toContainEqual(folderBDescription);
+    expect(files).toContainEqual(folderNDescription);
   });
 
   it('type: "folders" includes only folders', async () => {
     const { search } = createInspector({ type: 'folders' });
-    const files = await search(ROOT);
+    const files = await search(rootFolder);
 
     expect(files.length).toEqual(4);
-    expect(files).toContainEqual(ROOT_DESCRIPTION);
+    expect(files).toContainEqual(rootDescription);
 
-    expect(files).toContainEqual(FOLDER_A_DESCRIPTION);
-    expect(files).toContainEqual(FOLDER_B_DESCRIPTION);
-    expect(files).toContainEqual(FOLDER_N_DESCRIPTION);
+    expect(files).toContainEqual(folderADescription);
+    expect(files).toContainEqual(folderBDescription);
+    expect(files).toContainEqual(folderNDescription);
   });
 
   it('type: "files" includes only files', async () => {
     const { search } = createInspector({ type: 'files' });
-    const files = await search(ROOT);
+    const files = await search(rootFolder);
 
     expect(files.length).toEqual(3);
 
-    expect(files).toContainEqual(FILE_TXT_DESCRIPTION);
-    expect(files).toContainEqual(FILE_FQ_DESCRIPTION);
-    expect(files).toContainEqual(FILE_PNG_DESCRIPTION);
+    expect(files).toContainEqual(fileTXTDescription);
+    expect(files).toContainEqual(fileFQDescription);
+    expect(files).toContainEqual(filePNGDescription);
   });
 
   it('does not allow both type and includeFolder to be specified', () => {
-    expect(() => createInspector({ type: 'all', includeFolders: true })).toThrow('Clashing arguments "type" and "includeFolder" specified. Use "type: all" to include files and folders in your output.')
+    expect(() => createInspector({ type: 'all', includeFolders: true })).toThrow('Clashing arguments "type" and "includeFolder" specified. Use "type: all" to include files and folders in your output.');
   });
 
   it('can conditionally include hidden files/folders', async () => {
     const { search } = createInspector({ includeFolders: true, includeHidden: true });
-    const files = await search(ROOT);
+    const files = await search(rootFolder);
 
     expect(files.length).toEqual(10);
-    expect(files).toContainEqual(ROOT_DESCRIPTION);
+    expect(files).toContainEqual(rootDescription);
 
-    expect(files).toContainEqual(FILE_OBSCURED_DESCRIPTION);
-    expect(files).toContainEqual(FILE_TXT_DESCRIPTION);
-    expect(files).toContainEqual(FILE_HIDDEN_DESCRIPTION);
-    expect(files).toContainEqual(FILE_FQ_DESCRIPTION);
-    expect(files).toContainEqual(FILE_PNG_DESCRIPTION);
+    expect(files).toContainEqual(fileObscuredDescription);
+    expect(files).toContainEqual(fileTXTDescription);
+    expect(files).toContainEqual(fileHiddenDescription);
+    expect(files).toContainEqual(fileFQDescription);
+    expect(files).toContainEqual(filePNGDescription);
 
-    expect(files).toContainEqual(FOLDER_A_DESCRIPTION);
-    expect(files).toContainEqual(FOLDER_HIDDEN_DESCRIPTION);
-    expect(files).toContainEqual(FOLDER_B_DESCRIPTION);
-    expect(files).toContainEqual(FOLDER_N_DESCRIPTION);
+    expect(files).toContainEqual(folderADescription);
+    expect(files).toContainEqual(folderHiddenDescription);
+    expect(files).toContainEqual(folderBDescription);
+    expect(files).toContainEqual(folderNDescription);
   });
 
   it('can conditionally include hidden files', async () => {
     const { search } = createInspector({ includeHidden: true });
-    const files = await search(ROOT);
+    const files = await search(rootFolder);
 
     expect(files.length).toEqual(5);
 
-    expect(files).toContainEqual(FILE_OBSCURED_DESCRIPTION);
-    expect(files).toContainEqual(FILE_TXT_DESCRIPTION);
-    expect(files).toContainEqual(FILE_HIDDEN_DESCRIPTION);
-    expect(files).toContainEqual(FILE_FQ_DESCRIPTION);
-    expect(files).toContainEqual(FILE_PNG_DESCRIPTION);
+    expect(files).toContainEqual(fileObscuredDescription);
+    expect(files).toContainEqual(fileTXTDescription);
+    expect(files).toContainEqual(fileHiddenDescription);
+    expect(files).toContainEqual(fileFQDescription);
+    expect(files).toContainEqual(filePNGDescription);
   });
 
   it('can accept a file as an entry point', async() => {
     const { search } = createInspector();
-    const files = await search(FILE_PNG);
+    const files = await search(filePNG);
 
     expect(files.length).toEqual(1);
 
@@ -301,7 +301,7 @@ describe('inspector', () => {
       isDirectory: false,
       hidden: false,
       relative: '',
-      absolute: FILE_PNG,
+      absolute: filePNG,
       size: 18,
       base: 'example.png',
       name: 'example',
@@ -311,72 +311,72 @@ describe('inspector', () => {
 
   it('can accept a max depth limit', async() => {
     const { search } = createInspector({ maxDepth: 2 });
-    const files = await search(ROOT);
+    const files = await search(rootFolder);
 
     expect(files.length).toEqual(2);
 
-    expect(files).toContainEqual(FILE_TXT_DESCRIPTION);
-    expect(files).toContainEqual(FILE_FQ_DESCRIPTION);
+    expect(files).toContainEqual(fileTXTDescription);
+    expect(files).toContainEqual(fileFQDescription);
   });
 
   it('can accept a min depth limit', async() => {
     const { search } = createInspector({ minDepth: 2 });
-    const files = await search(ROOT);
+    const files = await search(rootFolder);
 
     expect(files.length).toEqual(2);
 
-    expect(files).toContainEqual(FILE_PNG_DESCRIPTION);
-    expect(files).toContainEqual(FILE_TXT_DESCRIPTION);
+    expect(files).toContainEqual(filePNGDescription);
+    expect(files).toContainEqual(fileTXTDescription);
   });
 
   it('can accept a max depth limit of 1', async() => {
     const { search } = createInspector({ maxDepth: 1 });
-    const files = await search(ROOT);
+    const files = await search(rootFolder);
 
     expect(files.length).toEqual(1);
 
-    expect(files).toContainEqual(FILE_FQ_DESCRIPTION);
+    expect(files).toContainEqual(fileFQDescription);
   });
 
   it('can filter results using a custom fn', async() => {
     const filter = ({ name }: FileInfo) => name.includes('file');
     const { search } = createInspector({ includeFolders: true, includeHidden: true, filter });
-    const files = await search(ROOT);
+    const files = await search(rootFolder);
 
     expect(files.length).toEqual(4);
 
-    expect(files).toContainEqual(FILE_OBSCURED_DESCRIPTION);
-    expect(files).toContainEqual(FILE_TXT_DESCRIPTION);
-    expect(files).toContainEqual(FILE_HIDDEN_DESCRIPTION);
-    expect(files).toContainEqual(FILE_FQ_DESCRIPTION);
+    expect(files).toContainEqual(fileObscuredDescription);
+    expect(files).toContainEqual(fileTXTDescription);
+    expect(files).toContainEqual(fileHiddenDescription);
+    expect(files).toContainEqual(fileFQDescription);
   });
 
   it('can exclude folders using a custom fn', async() => {
     const exclude = ({ name }: FileInfo) => name === 'folder a';
     const { search } = createInspector({ includeFolders: true, includeHidden: true, exclude });
-    const files = await search(ROOT);
+    const files = await search(rootFolder);
 
     expect(files.length).toEqual(7);
-    expect(files).toContainEqual(ROOT_DESCRIPTION);
+    expect(files).toContainEqual(rootDescription);
 
-    expect(files).toContainEqual(FILE_OBSCURED_DESCRIPTION);
-    expect(files).toContainEqual(FILE_TXT_DESCRIPTION);
-    expect(files).toContainEqual(FILE_HIDDEN_DESCRIPTION);
-    expect(files).toContainEqual(FILE_FQ_DESCRIPTION);
+    expect(files).toContainEqual(fileObscuredDescription);
+    expect(files).toContainEqual(fileTXTDescription);
+    expect(files).toContainEqual(fileHiddenDescription);
+    expect(files).toContainEqual(fileFQDescription);
 
-    expect(files).toContainEqual(FOLDER_HIDDEN_DESCRIPTION);
-    expect(files).toContainEqual(FOLDER_B_DESCRIPTION);
+    expect(files).toContainEqual(folderHiddenDescription);
+    expect(files).toContainEqual(folderBDescription);
   });
 
   it('can map results using a custom fn', async() => {
     const map = ({ absolute }: FileInfo) => absolute;
     const { search } = createInspector({ map });
-    const files = await search(ROOT);
+    const files = await search(rootFolder);
 
     expect(files.length).toEqual(3);
 
-    expect(files).toContainEqual(FILE_TXT);
-    expect(files).toContainEqual(FILE_FQ);
-    expect(files).toContainEqual(FILE_PNG);
+    expect(files).toContainEqual(fileTXT);
+    expect(files).toContainEqual(fileFQ);
+    expect(files).toContainEqual(filePNG);
   });
 });

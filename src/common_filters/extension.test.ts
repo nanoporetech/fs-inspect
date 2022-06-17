@@ -16,9 +16,9 @@ describe('common filter: extension', () => {
   it('is accepted by createInspector', () => {
     createInspector({ filter: filterByExtension([ 'gz' ])});
   });
-	it('accepts extensions with numbers in', () => {
-		const filter = filterByExtension(['cr2']);
-		expect(filter({ ext: '.cr2' })).toBeTruthy();
-		expect(filter({ ext: '.cr' })).toBeFalsy();
-	})
+  it('accepts extensions with numbers in', () => {
+    const filter = filterByExtension(['cr2']);
+    expect(filter({ ext: '.cr2' })).toBeTruthy();
+    expect(filter({ ext: '.cr' })).toBeFalsy();
+  });
 });
