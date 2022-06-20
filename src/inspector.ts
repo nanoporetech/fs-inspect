@@ -55,7 +55,7 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
       const results: T[] = [];
 
       const processEntry = async (basicInfo: BasicFileInfo, depth: number) => {
-        const info = await extendFileInfo(basicInfo);
+        let info: FileInfo | null = null;
 
         if (basicInfo.hidden && !includeHidden) {
           return; // this is a "hidden" dot file/folder, skip it unless we've been configured to include it
@@ -63,8 +63,12 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
         if (basicInfo.isDirectory) {
           // if we have reached the max depth then don't visit the contents of this folder
           if (depth < maxDepth) {
-            if (exclude && await exclude(info)) {
-              return; // if the exclusion folder indicates we should ignore this folder then exit here
+            if (exclude) {
+              info = await extendFileInfo(basicInfo);
+              if (await exclude(info)) {
+                // if the exclusion folder indicates we should ignore this folder then exit here
+                return;
+              }
             }
             // add all the entries of the folder to the queue
             for (const entry of await fs.promises.readdir(basicInfo.absolute, { withFileTypes: true })) {
@@ -89,6 +93,11 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
 
         if (depth < minDepth) {
           return; // if our current depth is less than the minDepth then exit before we get to the filter stage
+        }
+
+        // we'll need the full info object for filtering/output
+        if (info === null) {
+          info = await extendFileInfo(basicInfo);
         }
 
         // decide if we should include this entry in the result list
