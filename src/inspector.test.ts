@@ -379,4 +379,7 @@ describe('inspector', () => {
     expect(files).toContainEqual(fileFQ);
     expect(files).toContainEqual(filePNG);
   });
+
+  it.todo('calls recover for an error reading the entry point');
+  it.todo('propogates the error when entry point fails and no recover function is specified');
 });
