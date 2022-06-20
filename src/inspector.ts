@@ -61,15 +61,16 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
           return; // this is a "hidden" dot file/folder, skip it unless we've been configured to include it
         }
         if (basicInfo.isDirectory) {
-          // if we have reached the max depth then don't visit the contents of this folder
-          if (depth < maxDepth) {
-            if (exclude) {
-              fullInfo = await extendFileInfo(basicInfo);
-              if (await exclude(fullInfo)) {
-                // if the exclusion folder indicates we should ignore this folder then exit here
-                return;
-              }
+          if (exclude) {
+            fullInfo = await extendFileInfo(basicInfo);
+            if (await exclude(fullInfo)) {
+              // if the exclusion folder indicates we should ignore this folder then exit here
+              return;
             }
+          }
+
+          // if we have reached the max depth then don't visit the contents of this folder
+          if (depth < maxDepth) {  
             // add all the entries of the folder to the queue
             for (const entry of await fs.promises.readdir(basicInfo.absolute, { withFileTypes: true })) {
               const child = {
@@ -82,6 +83,7 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
               add(child, depth + 1);
             }
           }
+          
           if (includeTypes === 'files') {
             return; // unless we are set to include folders in the result exit before we get to the filter stage
           }
