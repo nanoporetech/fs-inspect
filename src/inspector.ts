@@ -92,14 +92,14 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
         }
 
         // decide if we should include this entry in the result list
-        if (!filter || await filter(info)) {
-          if (map) {
-            results.push(await map(info));
-          } else {
-            // if map is not specified T will be FileInfo
-            results.push(info as unknown as T);
+        if (filter) { 
+          if (!await filter(info)) {
+            return;
           }
         }
+
+        const output = map ? await map(info) : info;
+        results.push(output as unknown as T);
       };
 
       const { add, complete } = queue({ concurrency, fn: processEntry, recover });
