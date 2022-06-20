@@ -1,12 +1,12 @@
 import fs from 'fs';
 import path from 'path';
-import { makeFileInfo } from './FileInfo';
 import { queue } from './queue';
 import { isValidCount } from './isValidCount';
 
 import type { Inspector, InspectorOptions } from './inspector.type';
-import type { FileInfo } from './FileInfo.type';
+import type { BasicFileInfo, FileInfo } from './FileInfo.type';
 import { isDefined } from 'ts-runtime-typecheck';
+import { extendFileInfo, makeFileInfo } from './FileInfo';
 
 // T is intended to be inferred, specifying a type argument without `map` breaks the contract
 export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}): Inspector<T> {
@@ -53,10 +53,10 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
   return {
     async search (location: string): Promise<T[]> {
       const results: T[] = [];
-      const root = path.resolve(location);
 
-      const processEntry = async ([relative, depth]: [string, number]) => {
-        const info = await makeFileInfo(root, relative);
+      const processEntry = async (basicInfo: BasicFileInfo, depth: number) => {
+        const info = await extendFileInfo(basicInfo);
+
         if (info.hidden && !includeHidden) {
           return; // this is a "hidden" dot file/folder, skip it unless we've been configured to include it
         }
@@ -67,8 +67,15 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
               return; // if the exclusion folder indicates we should ignore this folder then exit here
             }
             // add all the entries of the folder to the queue
-            for (const entry of await fs.promises.readdir(info.absolute)) {
-              add(path.join(relative, entry), depth + 1);
+            for (const entry of await fs.promises.readdir(info.absolute, { withFileTypes: true })) {
+              const child = {
+                isDirectory: entry.isDirectory(),
+                hidden: entry.name.startsWith('.'),
+                relative: path.join(info.relative, entry.name),
+                absolute: path.join(info.absolute, entry.name),
+              };
+
+              add(child, depth + 1);
             }
           }
           if (includeTypes === 'files') {
@@ -97,8 +104,20 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
 
       const { add, complete } = queue({ concurrency, fn: processEntry, recover });
 
+      let rootEntry;
+
+      try {
+        rootEntry = await makeFileInfo(path.resolve(location), '');
+      } catch (e: unknown) {
+        if (recover) {
+          await recover(e, '');
+          return [];
+        }
+        throw e;
+      }
+
       // add the entry location to the queue to kick us off
-      add('', 0);
+      add(rootEntry, 0);
       // waits until the queue is empty, or an error occurs
       await complete;
       return results;
