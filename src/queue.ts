@@ -1,13 +1,14 @@
 import { asDefined } from 'ts-runtime-typecheck';
 import { deferred } from './deferred';
+import type { BasicFileInfo } from './FileInfo.type';
 
 export function queue ({ concurrency, recover, fn }: { 
   concurrency: number;
   recover?: (error: unknown, location: string) => Promise<void> | void;
-  fn: (v: [string, number]) => Promise<void> | void;
-}): { add: (location: string, depth: number) => void; complete: Promise<void> } {
+  fn: (info: BasicFileInfo, depth: number) => Promise<void> | void;
+}): { add: (location: BasicFileInfo, depth: number) => void; complete: Promise<void> } {
   const { promise, resolve, reject } = deferred<void>();
-  const pending: [string, number][] = [];
+  const pending: [BasicFileInfo, number][] = [];
   let running = 0;
   let stopped = false;
 
@@ -18,16 +19,16 @@ export function queue ({ concurrency, recover, fn }: {
     // running threads goes up and down depending on the amount in the queue
     // and thread congestion
     while (pending.length > 0) {
-      const next = asDefined(pending.shift()); // we check above, so this will always return a value
+      const [info, depth] = asDefined(pending.shift()); // we check above, so this will always return a value
       try {
-        await fn(next);
+        await fn(info, depth);
       } catch (e: unknown) {
         let err = e;
         let recovered = false;
 
         if (recover) {
           try {
-            await recover(e, next[0]);
+            await recover(e, info.relative);
             recovered = true;
           } catch (e) {
             err = e;
@@ -52,12 +53,12 @@ export function queue ({ concurrency, recover, fn }: {
   };
 
   return {
-    add (location: string, depth: number) {
+    add (info: BasicFileInfo, depth: number) {
       if (stopped) {
         return; // don't add to queue or start threads if we have failed
       }
       // add to queue
-      pending.push([location, depth]);
+      pending.push([info, depth]);
       // if we aren't at our concurrency limit start a new thread
       if (running < concurrency) {
         void runThread();
