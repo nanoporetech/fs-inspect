@@ -23,10 +23,6 @@ export async function makeFileInfo(root: string, relative: string): Promise<File
   };
 }
 
-export function isFileInfo(entry: BasicFileInfo): entry is FileInfo {
-  return 'size' in entry;
-}
-
 export async function extendFileInfo(entry: BasicFileInfo): Promise<FileInfo> {
   const { base, name, ext } = path.parse(entry.absolute);
   const info = await fs.promises.stat(entry.absolute);
