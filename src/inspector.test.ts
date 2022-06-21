@@ -380,6 +380,20 @@ describe('inspector', () => {
     expect(files).toContainEqual(filePNG);
   });
 
-  it.todo('calls recover for an error reading the entry point');
-  it.todo('propogates the error when entry point fails and no recover function is specified');
+  it('calls recover for an error reading the entry point', async() => {
+    const inspector = createInspector({
+      catch(err) {
+        expect(((err as { code: string }).code === 'ENOENT'));
+      }
+    });
+
+    const result = await inspector.search(path.join(rootFolder, 'ghost'));
+
+    expect(result).toStrictEqual([]);
+  });
+
+  it('propogates the error when entry point fails and no recover function is specified', async() => {
+    const inspector = createInspector({});
+    await expect(inspector.search(path.join(rootFolder, 'ghost'))).rejects.toThrow(/^ENOENT/);
+  });
 });
