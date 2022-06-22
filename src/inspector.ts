@@ -1,12 +1,12 @@
 import fs from 'fs';
 import path from 'path';
-import { makeFileInfo } from './FileInfo';
 import { queue } from './queue';
 import { isValidCount } from './isValidCount';
 
 import type { Inspector, InspectorOptions } from './inspector.type';
-import type { FileInfo } from './FileInfo.type';
+import type { BasicFileInfo, FileInfo } from './FileInfo.type';
 import { isDefined } from 'ts-runtime-typecheck';
+import { extendFileInfo, makeFileInfo } from './FileInfo';
 
 // T is intended to be inferred, specifying a type argument without `map` breaks the contract
 export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}): Inspector<T> {
@@ -53,24 +53,37 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
   return {
     async search (location: string): Promise<T[]> {
       const results: T[] = [];
-      const root = path.resolve(location);
 
-      const processEntry = async ([relative, depth]: [string, number]) => {
-        const info = await makeFileInfo(root, relative);
-        if (info.hidden && !includeHidden) {
+      const processEntry = async (basicInfo: BasicFileInfo, depth: number) => {
+        let fullInfo: FileInfo | null = null;
+
+        if (basicInfo.hidden && !includeHidden) {
           return; // this is a "hidden" dot file/folder, skip it unless we've been configured to include it
         }
-        if (info.isDirectory) {
-          // if we have reached the max depth then don't visit the contents of this folder
-          if (depth < maxDepth) {
-            if (exclude && await exclude(info)) {
-              return; // if the exclusion folder indicates we should ignore this folder then exit here
-            }
-            // add all the entries of the folder to the queue
-            for (const entry of await fs.promises.readdir(info.absolute)) {
-              add(path.join(relative, entry), depth + 1);
+        if (basicInfo.isDirectory) {
+          if (exclude) {
+            fullInfo = await extendFileInfo(basicInfo);
+            if (await exclude(fullInfo)) {
+              // if the exclusion folder indicates we should ignore this folder then exit here
+              return;
             }
           }
+
+          // if we have reached the max depth then don't visit the contents of this folder
+          if (depth < maxDepth) {  
+            // add all the entries of the folder to the queue
+            for (const entry of await fs.promises.readdir(basicInfo.absolute, { withFileTypes: true })) {
+              const child = {
+                isDirectory: entry.isDirectory(),
+                hidden: entry.name.startsWith('.'),
+                relative: path.join(basicInfo.relative, entry.name),
+                absolute: path.join(basicInfo.absolute, entry.name),
+              };
+
+              add(child, depth + 1);
+            }
+          }
+          
           if (includeTypes === 'files') {
             return; // unless we are set to include folders in the result exit before we get to the filter stage
           }
@@ -84,21 +97,38 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
           return; // if our current depth is less than the minDepth then exit before we get to the filter stage
         }
 
+        // we'll need the full info object for filtering/output
+        if (fullInfo === null) {
+          fullInfo = await extendFileInfo(basicInfo);
+        }
+
         // decide if we should include this entry in the result list
-        if (!filter || await filter(info)) {
-          if (map) {
-            results.push(await map(info));
-          } else {
-            // if map is not specified T will be FileInfo
-            results.push(info as unknown as T);
+        if (filter) { 
+          if (!await filter(fullInfo)) {
+            return;
           }
         }
+
+        const output = map ? await map(fullInfo) : fullInfo;
+        results.push(output as unknown as T);
       };
 
       const { add, complete } = queue({ concurrency, fn: processEntry, recover });
 
+      let rootEntry;
+
+      try {
+        rootEntry = await makeFileInfo(path.resolve(location), '');
+      } catch (e: unknown) {
+        if (recover) {
+          await recover(e, '');
+          return [];
+        }
+        throw e;
+      }
+
       // add the entry location to the queue to kick us off
-      add('', 0);
+      add(rootEntry, 0);
       // waits until the queue is empty, or an error occurs
       await complete;
       return results;
