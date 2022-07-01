@@ -1,22 +1,24 @@
 import typescript from 'rollup-plugin-typescript2';
 import pkg from './package.json';
-import resolve from '@rollup/plugin-node-resolve';
+import { dirname } from 'path';
 
 export default {
   input: 'src/index.ts',
+  external: ['fs', 'path', 'ts-runtime-typecheck'],
+  preserveModules: true,
   plugins: [
-    typescript(),
-    resolve()
+    typescript({ tsconfig: './tsconfig.main.json' })
   ],
   output: [
     {
-      file: `dist/${pkg.main}`,
+      dir: `dist/${dirname(pkg.main)}`,
+      entryFileNames: '[name].js',
       format: 'cjs'
     },
     {
-      file: `dist/${pkg.module}`,
+      dir: `dist/${dirname(pkg.module)}`,
+      entryFileNames: '[name].mjs',
       format: 'esm'
     }
-  ],
-  external: ['fs']
+  ]
 };

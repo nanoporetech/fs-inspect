@@ -4,7 +4,7 @@ import type { BasicFileInfo } from './FileInfo.type';
 
 export function queue ({ concurrency, recover, fn }: { 
   concurrency: number;
-  recover?: (error: unknown, location: string) => Promise<void> | void;
+  recover?: ((error: unknown, location: string) => Promise<void> | void) | undefined;
   fn: (info: BasicFileInfo, depth: number) => Promise<void> | void;
 }): { add: (location: BasicFileInfo, depth: number) => void; complete: Promise<void> } {
   const { promise, resolve, reject } = deferred<void>();
