@@ -3,13 +3,15 @@ import path from 'path';
 import { queue } from './queue';
 import { isValidCount } from './isValidCount';
 
-import type { Inspector, InspectorOptions } from './inspector.type';
+import type { Inspector, InspectorOptions, NormalInspectorOptions, SimpleInspectorOptions } from './inspector.type';
 import type { BasicFileInfo, FileInfo } from './FileInfo.type';
 import { isDefined } from 'ts-runtime-typecheck';
 import { extendFileInfo, makeFileInfo } from './FileInfo';
 
 // T is intended to be inferred, specifying a type argument without `map` breaks the contract
-export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}): Inspector<T> {
+export function createInspector <T = BasicFileInfo>(options?: SimpleInspectorOptions<T>): Inspector<T>;
+export function createInspector <T = FileInfo>(options?: NormalInspectorOptions<T>): Inspector<T>;
+export function createInspector <T>(options: InspectorOptions<T> = {}): Inspector<T> {
   const {
     exclude,
     filter,
@@ -17,6 +19,7 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
     concurrency = 8,
     maxDepth = Infinity,
     minDepth = 0,
+    simpleMode,
     catch: recover,
     type,
     includeFolders,
@@ -62,10 +65,19 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
         }
         if (basicInfo.isDirectory) {
           if (exclude) {
-            fullInfo = await extendFileInfo(basicInfo);
-            if (await exclude(fullInfo)) {
-              // if the exclusion folder indicates we should ignore this folder then exit here
-              return;
+            if (simpleMode) {
+              if (await exclude(basicInfo)) {
+                // if the exclusion folder indicates we should ignore this folder then exit here
+                return;
+              }
+            }
+            else {
+              // in simple mode we want to avoid running this stat operation
+              fullInfo = await extendFileInfo(basicInfo);
+              if (await exclude(fullInfo)) {
+                // if the exclusion folder indicates we should ignore this folder then exit here
+                return;
+              }
             }
           }
 
@@ -97,13 +109,26 @@ export function createInspector <T = FileInfo>(options: InspectorOptions<T> = {}
           return; // if our current depth is less than the minDepth then exit before we get to the filter stage
         }
 
+
+        if (simpleMode) {
+          if (filter) {
+            if (await filter(basicInfo)) {
+              return;
+            }
+          }
+          const output = map ? await map(basicInfo) : basicInfo;
+          results.push(output as unknown as T);
+
+          return;
+        }
+
         // we'll need the full info object for filtering/output
         if (fullInfo === null) {
           fullInfo = await extendFileInfo(basicInfo);
         }
 
-        // decide if we should include this entry in the result list
-        if (filter) { 
+        if (filter) {
+          // NOTE fullInfo will always be defined here
           if (!await filter(fullInfo)) {
             return;
           }
