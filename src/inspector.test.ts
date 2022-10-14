@@ -57,12 +57,12 @@ describe('inspector', () => {
     fileFQ = path.join(rootFolder, 'another.file.fastq');
     fileHidden = path.join(rootFolder, '.hidden file.json');
     fileObscured = path.join(folderHidden, 'obscured file.tar.gz');
-    
+
     await fs.promises.mkdir(folderA);
     await fs.promises.mkdir(folderB);
     await fs.promises.mkdir(folderHidden);
     await fs.promises.mkdir(folderN);
-  
+
     await fs.promises.writeFile(fileTXT, 'hello world');
     await fs.promises.writeFile(fileFQ, 'this is another file with some text in');
     await fs.promises.writeFile(fileHidden, 'secret');
@@ -89,7 +89,7 @@ describe('inspector', () => {
     folderNDescription = expect.objectContaining({
       isDirectory: true,
       hidden: false,
-      relative: 'folder a/folder n',
+      relative: path.normalize('folder a/folder n'),
       absolute: folderN,
       size: 0,
       base: 'folder n',
@@ -116,11 +116,11 @@ describe('inspector', () => {
       name: '.hidden folder',
       ext: '',
     }) as Partial<FileInfo>;
-  
+
     filePNGDescription = expect.objectContaining({
       isDirectory: false,
       hidden: false,
-      relative: 'folder a/folder n/example.png',
+      relative: path.normalize('folder a/folder n/example.png'),
       absolute: filePNG,
       size: 18,
       base: 'example.png',
@@ -130,7 +130,7 @@ describe('inspector', () => {
     fileTXTDescription = expect.objectContaining({
       isDirectory: false,
       hidden: false,
-      relative: 'folder b/file.txt',
+      relative: path.normalize('folder b/file.txt'),
       absolute: fileTXT,
       size: 11,
       base: 'file.txt',
@@ -160,7 +160,7 @@ describe('inspector', () => {
     fileObscuredDescription = expect.objectContaining({
       isDirectory: false,
       hidden: false,
-      relative: '.hidden folder/obscured file.tar.gz',
+      relative: path.normalize('.hidden folder/obscured file.tar.gz'),
       absolute: fileObscured,
       size: 22,
       base: 'obscured file.tar.gz',
